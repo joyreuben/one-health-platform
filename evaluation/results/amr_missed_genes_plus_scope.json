@@ -1,0 +1,287 @@
+{
+  "note": "The 35 ResFinder genes not detected in the platform's default (core) scope, re-run with AMRFinderPlus --plus.",
+  "found_with_plus_scope": 6,
+  "n": 35,
+  "genes": [
+    {
+      "resfinder_gene": "aac(6')-Iaa_1_NC_003197",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "grmO_1_AY524043",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "grmA_1_M55520",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "kgmB_1_S60108",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "aac(3)-Ih_1_CP000490",
+      "found_with_plus_scope": true,
+      "amrfinder_gene": "aac(3)-Ih",
+      "scope": "plus",
+      "type": "AMR",
+      "class": "AMINOGLYCOSIDE"
+    },
+    {
+      "resfinder_gene": "kmr_1_ENA_ACB88605",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "blaACC-3_1_AF180958",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "penA_1_AF515059",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "blaFLC-1_1_NG_065869",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "mcr-9.1_1_MK070339",
+      "found_with_plus_scope": true,
+      "amrfinder_gene": "mcr-9.1",
+      "scope": "plus",
+      "type": "AMR",
+      "class": "COLISTIN"
+    },
+    {
+      "resfinder_gene": "mcr-9.2_1_MN164032",
+      "found_with_plus_scope": true,
+      "amrfinder_gene": "mcr-9.2",
+      "scope": "plus",
+      "type": "AMR",
+      "class": "COLISTIN"
+    },
+    {
+      "resfinder_gene": "mcr-9.3_1_MT505326",
+      "found_with_plus_scope": true,
+      "amrfinder_gene": "mcr-9.3",
+      "scope": "plus",
+      "type": "AMR",
+      "class": "COLISTIN"
+    },
+    {
+      "resfinder_gene": "erm(A)_3_EU348758",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "erm(41)_1_EU177504",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "lmr(A)_1_X59926",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "ole(C)_1_L06249",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "mph(D)_1_AB048591",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "mph(N)_1_KF648874",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "mph(I)_1_KX531056",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "mdt(A)_1_X92946",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "mre(A)_1_U92073",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "cmr_1_U43535",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "NarA_1_MN590304",
+      "found_with_plus_scope": true,
+      "amrfinder_gene": "narA",
+      "scope": "plus",
+      "type": "AMR",
+      "class": "IONOPHORE"
+    },
+    {
+      "resfinder_gene": "NarB_1_MN590304",
+      "found_with_plus_scope": true,
+      "amrfinder_gene": "narB",
+      "scope": "plus",
+      "type": "AMR",
+      "class": "IONOPHORE"
+    },
+    {
+      "resfinder_gene": "nimF_1_AJ515145",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "nimH_1_KX576455",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "catS_1_X74948",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "cml_1_M22614",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "cat_4_AY238971",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "EstDL136_1_JN242251",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "catT_1_MW030510",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "tet(34)_1_AB061440",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "tet(43)_1_GQ244501",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "otr(C)_1_AY509111",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    },
+    {
+      "resfinder_gene": "TOprJ4_1_CP091084",
+      "found_with_plus_scope": false,
+      "amrfinder_gene": "",
+      "scope": "",
+      "type": "",
+      "class": ""
+    }
+  ]
+}
