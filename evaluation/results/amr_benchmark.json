@@ -1,0 +1,718 @@
+{
+  "generated": "2026-11-15 11:57:50",
+  "platform_version": "4.0.0",
+  "amrfinderplus": {
+    "software": "4.2.7",
+    "database": "2026-10-29.1"
+  },
+  "resfinder_db_version": "2.7.0",
+  "random_seed": 20261115,
+  "positives": {
+    "source": "ResFinder database, per-class FASTA files, unique headers",
+    "n": 3212,
+    "rejected_by_input_validation": 0,
+    "detected": {
+      "k": 3177,
+      "n": 3212,
+      "pct": 98.91,
+      "ci95": [
+        98.49,
+        99.22
+      ]
+    },
+    "class_concordant_among_detected": {
+      "k": 3174,
+      "n": 3177,
+      "pct": 99.91,
+      "ci95": [
+        99.72,
+        99.97
+      ]
+    },
+    "detected_and_class_concordant": {
+      "k": 3174,
+      "n": 3212,
+      "pct": 98.82,
+      "ci95": [
+        98.38,
+        99.14
+      ]
+    },
+    "detection_method_counts": {
+      "ALLELEX": 2116,
+      "EXACTX": 785,
+      "BLASTX": 265,
+      "PARTIAL_CONTIG_ENDX": 8,
+      "PARTIALX": 3
+    },
+    "per_resfinder_file": {
+      "aminoglycoside": {
+        "n": 264,
+        "detected": {
+          "k": 258,
+          "n": 264,
+          "pct": 97.73,
+          "ci95": [
+            95.13,
+            98.95
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 258,
+          "n": 258,
+          "pct": 100.0,
+          "ci95": [
+            98.53,
+            100.0
+          ]
+        }
+      },
+      "beta-lactam": {
+        "n": 2031,
+        "detected": {
+          "k": 2028,
+          "n": 2031,
+          "pct": 99.85,
+          "ci95": [
+            99.57,
+            99.95
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 2028,
+          "n": 2028,
+          "pct": 100.0,
+          "ci95": [
+            99.81,
+            100.0
+          ]
+        }
+      },
+      "colistin": {
+        "n": 109,
+        "detected": {
+          "k": 106,
+          "n": 109,
+          "pct": 97.25,
+          "ci95": [
+            92.22,
+            99.06
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 106,
+          "n": 106,
+          "pct": 100.0,
+          "ci95": [
+            96.5,
+            100.0
+          ]
+        }
+      },
+      "fosfomycin": {
+        "n": 40,
+        "detected": {
+          "k": 40,
+          "n": 40,
+          "pct": 100.0,
+          "ci95": [
+            91.24,
+            100.0
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 40,
+          "n": 40,
+          "pct": 100.0,
+          "ci95": [
+            91.24,
+            100.0
+          ]
+        }
+      },
+      "fusidicacid": {
+        "n": 3,
+        "detected": {
+          "k": 3,
+          "n": 3,
+          "pct": 100.0,
+          "ci95": [
+            43.85,
+            100.0
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 3,
+          "n": 3,
+          "pct": 100.0,
+          "ci95": [
+            43.85,
+            100.0
+          ]
+        }
+      },
+      "glycopeptide": {
+        "n": 24,
+        "detected": {
+          "k": 24,
+          "n": 24,
+          "pct": 100.0,
+          "ci95": [
+            86.2,
+            100.0
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 23,
+          "n": 24,
+          "pct": 95.83,
+          "ci95": [
+            79.76,
+            99.26
+          ]
+        }
+      },
+      "macrolide": {
+        "n": 174,
+        "detected": {
+          "k": 164,
+          "n": 174,
+          "pct": 94.25,
+          "ci95": [
+            89.75,
+            96.85
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 162,
+          "n": 164,
+          "pct": 98.78,
+          "ci95": [
+            95.66,
+            99.66
+          ]
+        }
+      },
+      "misc": {
+        "n": 2,
+        "detected": {
+          "k": 0,
+          "n": 2,
+          "pct": 0.0,
+          "ci95": [
+            0.0,
+            65.76
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 0,
+          "n": 0,
+          "pct": null,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "nitroimidazole": {
+        "n": 14,
+        "detected": {
+          "k": 12,
+          "n": 14,
+          "pct": 85.71,
+          "ci95": [
+            60.06,
+            95.99
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 12,
+          "n": 12,
+          "pct": 100.0,
+          "ci95": [
+            75.75,
+            100.0
+          ]
+        }
+      },
+      "oxazolidinone": {
+        "n": 22,
+        "detected": {
+          "k": 22,
+          "n": 22,
+          "pct": 100.0,
+          "ci95": [
+            85.13,
+            100.0
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 22,
+          "n": 22,
+          "pct": 100.0,
+          "ci95": [
+            85.13,
+            100.0
+          ]
+        }
+      },
+      "phenicol": {
+        "n": 66,
+        "detected": {
+          "k": 61,
+          "n": 66,
+          "pct": 92.42,
+          "ci95": [
+            83.46,
+            96.72
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 61,
+          "n": 61,
+          "pct": 100.0,
+          "ci95": [
+            94.08,
+            100.0
+          ]
+        }
+      },
+      "pseudomonicacid": {
+        "n": 3,
+        "detected": {
+          "k": 3,
+          "n": 3,
+          "pct": 100.0,
+          "ci95": [
+            43.85,
+            100.0
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 3,
+          "n": 3,
+          "pct": 100.0,
+          "ci95": [
+            43.85,
+            100.0
+          ]
+        }
+      },
+      "quinolone": {
+        "n": 125,
+        "detected": {
+          "k": 125,
+          "n": 125,
+          "pct": 100.0,
+          "ci95": [
+            97.02,
+            100.0
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 125,
+          "n": 125,
+          "pct": 100.0,
+          "ci95": [
+            97.02,
+            100.0
+          ]
+        }
+      },
+      "rifampicin": {
+        "n": 10,
+        "detected": {
+          "k": 10,
+          "n": 10,
+          "pct": 100.0,
+          "ci95": [
+            72.25,
+            100.0
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 10,
+          "n": 10,
+          "pct": 100.0,
+          "ci95": [
+            72.25,
+            100.0
+          ]
+        }
+      },
+      "sulphonamide": {
+        "n": 54,
+        "detected": {
+          "k": 54,
+          "n": 54,
+          "pct": 100.0,
+          "ci95": [
+            93.36,
+            100.0
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 54,
+          "n": 54,
+          "pct": 100.0,
+          "ci95": [
+            93.36,
+            100.0
+          ]
+        }
+      },
+      "tetracycline": {
+        "n": 162,
+        "detected": {
+          "k": 158,
+          "n": 162,
+          "pct": 97.53,
+          "ci95": [
+            93.82,
+            99.04
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 158,
+          "n": 158,
+          "pct": 100.0,
+          "ci95": [
+            97.63,
+            100.0
+          ]
+        }
+      },
+      "trimethoprim": {
+        "n": 109,
+        "detected": {
+          "k": 109,
+          "n": 109,
+          "pct": 100.0,
+          "ci95": [
+            96.6,
+            100.0
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 109,
+          "n": 109,
+          "pct": 100.0,
+          "ci95": [
+            96.6,
+            100.0
+          ]
+        }
+      }
+    }
+  },
+  "negatives": {
+    "ecoli_k12_cds": {
+      "n": 4318,
+      "valid_input": 4318,
+      "with_any_amr_call": {
+        "k": 0,
+        "n": 4318,
+        "pct": 0.0,
+        "ci95": [
+          0.0,
+          0.09
+        ]
+      },
+      "no_call": {
+        "k": 4318,
+        "n": 4318,
+        "pct": 100.0,
+        "ci95": [
+          99.91,
+          100.0
+        ]
+      }
+    },
+    "shuffled_positives": {
+      "n": 3212,
+      "valid_input": 3212,
+      "with_any_amr_call": {
+        "k": 0,
+        "n": 3212,
+        "pct": 0.0,
+        "ci95": [
+          0.0,
+          0.12
+        ]
+      },
+      "no_call": {
+        "k": 3212,
+        "n": 3212,
+        "pct": 100.0,
+        "ci95": [
+          99.88,
+          100.0
+        ]
+      }
+    }
+  },
+  "robustness": {
+    "sample_size": 300,
+    "substitution": [
+      {
+        "nucleotide_substitution_rate": 0.01,
+        "detected": {
+          "k": 300,
+          "n": 300,
+          "pct": 100.0,
+          "ci95": [
+            98.74,
+            100.0
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 300,
+          "n": 300,
+          "pct": 100.0,
+          "ci95": [
+            98.74,
+            100.0
+          ]
+        },
+        "mean_confidence": 0.9166,
+        "mean_protein_identity": 97.67
+      },
+      {
+        "nucleotide_substitution_rate": 0.02,
+        "detected": {
+          "k": 298,
+          "n": 300,
+          "pct": 99.33,
+          "ci95": [
+            97.6,
+            99.82
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 298,
+          "n": 298,
+          "pct": 100.0,
+          "ci95": [
+            98.73,
+            100.0
+          ]
+        },
+        "mean_confidence": 0.8784,
+        "mean_protein_identity": 95.45
+      },
+      {
+        "nucleotide_substitution_rate": 0.05,
+        "detected": {
+          "k": 51,
+          "n": 300,
+          "pct": 17.0,
+          "ci95": [
+            13.17,
+            21.66
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 51,
+          "n": 51,
+          "pct": 100.0,
+          "ci95": [
+            93.0,
+            100.0
+          ]
+        },
+        "mean_confidence": 0.8356,
+        "mean_protein_identity": 90.52
+      },
+      {
+        "nucleotide_substitution_rate": 0.1,
+        "detected": {
+          "k": 0,
+          "n": 300,
+          "pct": 0.0,
+          "ci95": [
+            0.0,
+            1.26
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 0,
+          "n": 0,
+          "pct": null,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "mean_confidence": null,
+        "mean_protein_identity": null
+      },
+      {
+        "nucleotide_substitution_rate": 0.15,
+        "detected": {
+          "k": 0,
+          "n": 300,
+          "pct": 0.0,
+          "ci95": [
+            0.0,
+            1.26
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 0,
+          "n": 0,
+          "pct": null,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "mean_confidence": null,
+        "mean_protein_identity": null
+      },
+      {
+        "nucleotide_substitution_rate": 0.2,
+        "detected": {
+          "k": 0,
+          "n": 300,
+          "pct": 0.0,
+          "ci95": [
+            0.0,
+            1.26
+          ]
+        },
+        "class_concordant_among_detected": {
+          "k": 0,
+          "n": 0,
+          "pct": null,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "mean_confidence": null,
+        "mean_protein_identity": null
+      }
+    ],
+    "truncation": [
+      {
+        "fraction_of_gene_kept": 0.9,
+        "detected": {
+          "k": 300,
+          "n": 300,
+          "pct": 100.0,
+          "ci95": [
+            98.74,
+            100.0
+          ]
+        },
+        "mean_confidence": 0.9319
+      },
+      {
+        "fraction_of_gene_kept": 0.75,
+        "detected": {
+          "k": 300,
+          "n": 300,
+          "pct": 100.0,
+          "ci95": [
+            98.74,
+            100.0
+          ]
+        },
+        "mean_confidence": 0.8385
+      },
+      {
+        "fraction_of_gene_kept": 0.5,
+        "detected": {
+          "k": 294,
+          "n": 300,
+          "pct": 98.0,
+          "ci95": [
+            95.71,
+            99.08
+          ]
+        },
+        "mean_confidence": 0.764
+      },
+      {
+        "fraction_of_gene_kept": 0.25,
+        "detected": {
+          "k": 2,
+          "n": 300,
+          "pct": 0.67,
+          "ci95": [
+            0.18,
+            2.4
+          ]
+        },
+        "mean_confidence": 0.813
+      }
+    ]
+  },
+  "legacy_baseline": {
+    "keyword_matcher_given_true_gene_name": {
+      "recognised": {
+        "k": 965,
+        "n": 3212,
+        "pct": 30.04,
+        "ci95": [
+          28.48,
+          31.65
+        ]
+      },
+      "recognised_and_class_correct": {
+        "k": 965,
+        "n": 3212,
+        "pct": 30.04,
+        "ci95": [
+          28.48,
+          31.65
+        ]
+      }
+    },
+    "sequence_motif_scan": {
+      "recognised": {
+        "k": 178,
+        "n": 3212,
+        "pct": 5.54,
+        "ci95": [
+          4.8,
+          6.39
+        ]
+      },
+      "recognised_and_class_correct": {
+        "k": 178,
+        "n": 3212,
+        "pct": 5.54,
+        "ci95": [
+          4.8,
+          6.39
+        ]
+      }
+    },
+    "ecoli_k12_calls": {
+      "keyword_matcher_on_gene_name": {
+        "k": 0,
+        "n": 4318,
+        "pct": 0.0,
+        "ci95": [
+          0.0,
+          0.09
+        ]
+      },
+      "sequence_motif_scan": {
+        "k": 0,
+        "n": 4318,
+        "pct": 0.0,
+        "ci95": [
+          0.0,
+          0.09
+        ]
+      }
+    }
+  },
+  "throughput": {
+    "sequences": 10742,
+    "seconds": 442.6,
+    "sequences_per_second": 24.3
+  }
+}

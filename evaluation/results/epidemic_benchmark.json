@@ -1,0 +1,161 @@
+{
+  "generated": "2026-11-15 10:47:41",
+  "platform_version": "4.0.0",
+  "random_seed": 20261115,
+  "claude_evaluated": false,
+  "A_heuristic_screen_constraint": {
+    "dataset": "CONSTRAINT-2021 COVID-19 Fake News (Patwa et al.), train+val+test; the screen is rule-based and was not fitted to this data",
+    "all": {
+      "n": 10700,
+      "confusion": {
+        "fake_blocked": 1352,
+        "fake_passed": 3748,
+        "real_blocked": 145,
+        "real_passed": 5455
+      },
+      "sensitivity_fake_blocked": {
+        "k": 1352,
+        "n": 5100,
+        "pct": 26.51,
+        "ci95": [
+          25.32,
+          27.74
+        ]
+      },
+      "specificity_real_passed": {
+        "k": 5455,
+        "n": 5600,
+        "pct": 97.41,
+        "ci95": [
+          96.96,
+          97.8
+        ]
+      },
+      "precision_of_block": {
+        "k": 1352,
+        "n": 1497,
+        "pct": 90.31,
+        "ci95": [
+          88.71,
+          91.71
+        ]
+      },
+      "accuracy": {
+        "k": 6807,
+        "n": 10700,
+        "pct": 63.62,
+        "ci95": [
+          62.7,
+          64.52
+        ]
+      },
+      "f1_fake": 0.4099
+    },
+    "official_test_split": {
+      "n": 2140,
+      "confusion": {
+        "fake_blocked": 280,
+        "fake_passed": 740,
+        "real_blocked": 37,
+        "real_passed": 1083
+      },
+      "sensitivity_fake_blocked": {
+        "k": 280,
+        "n": 1020,
+        "pct": 27.45,
+        "ci95": [
+          24.8,
+          30.27
+        ]
+      },
+      "specificity_real_passed": {
+        "k": 1083,
+        "n": 1120,
+        "pct": 96.7,
+        "ci95": [
+          95.48,
+          97.59
+        ]
+      },
+      "precision_of_block": {
+        "k": 280,
+        "n": 317,
+        "pct": 88.33,
+        "ci95": [
+          84.33,
+          91.41
+        ]
+      },
+      "accuracy": {
+        "k": 1363,
+        "n": 2140,
+        "pct": 63.69,
+        "ci95": [
+          61.63,
+          65.7
+        ]
+      },
+      "f1_fake": 0.4188
+    },
+    "verdicts_for_fake_posts": {
+      "FAKE": 105,
+      "LIKELY_FAKE": 1247,
+      "LIKELY_REAL": 2660,
+      "UNVERIFIABLE": 1088
+    },
+    "verdicts_for_real_posts": {
+      "LIKELY_FAKE": 145,
+      "LIKELY_REAL": 5090,
+      "UNVERIFIABLE": 365
+    },
+    "median_post_length_chars": 169
+  },
+  "B_heuristic_screen_who_reports": {
+    "dataset": "149 WHO Disease Outbreak News reports published 2024-03-13 to 2026-11-13",
+    "reports_per_publication_year": {
+      "2024": 74,
+      "2025": 40,
+      "2026": 35
+    },
+    "wrongly_blocked": {
+      "k": 0,
+      "n": 149,
+      "pct": 0.0,
+      "ci95": [
+        0.0,
+        2.51
+      ]
+    },
+    "verdicts": {
+      "LIKELY_REAL": 139,
+      "UNVERIFIABLE": 10
+    }
+  },
+  "C_extraction_who_reports": {
+    "answer_key": "disease and location parsed from the WHO report title; title withheld from the extractor",
+    "n_reports": 149,
+    "n_with_specific_location_in_title": 120,
+    "distinct_diseases_in_answer_key": 58,
+    "keyword_fallback": {
+      "disease_correct": {
+        "k": 27,
+        "n": 149,
+        "pct": 18.12,
+        "ci95": [
+          12.76,
+          25.08
+        ]
+      },
+      "location_correct": {
+        "k": 0,
+        "n": 120,
+        "pct": 0.0,
+        "ci95": [
+          0.0,
+          3.1
+        ]
+      },
+      "note": "the fallback recognises only Ebola, COVID-19 and mpox and never extracts a location"
+    }
+  }
+}

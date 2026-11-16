@@ -1,0 +1,11 @@
+# Streamlit looks for this file in the folder you launch from, so run the
+# app from the project root:  streamlit run code/app.py
+[theme]
+base = "dark"
+primaryColor = "#2DD4BF"
+backgroundColor = "#060A13"
+secondaryBackgroundColor = "#0F172A"
+textColor = "#E2E8F0"
+
+[client]
+toolbarMode = "minimal"

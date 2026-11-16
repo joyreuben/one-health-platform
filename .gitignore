@@ -1,0 +1,16 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Runtime data written by the app (may contain analysis results)
+data/
+logs/
+location_cache.json
+
+# Evaluation datasets (third-party; re-create with evaluation/download_data.py)
+evaluation/data/
+
+# Secrets
+.streamlit/secrets.toml
+.env
