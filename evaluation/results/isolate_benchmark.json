@@ -1,0 +1,1135 @@
+{
+  "dataset": "NCBI Pathogen Detection, Klebsiella (PDG000000012.2582), clinical K. pneumoniae isolates with assembly and AST phenotypes",
+  "seed": 20261117,
+  "organism_option": "Klebsiella_pneumoniae",
+  "amrfinder": {
+    "version": "4.2.7",
+    "database": "2026-10-29.1"
+  },
+  "candidates": 1002,
+  "selected": 100,
+  "analysed": 99,
+  "failed": {
+    "GCA_004322995.1": "no cached AMRFinderPlus result (failed or not yet run)"
+  },
+  "bioprojects": 43,
+  "countries": {
+    "USA": 30,
+    "NULL": 13,
+    "Brazil": 7,
+    "Pakistan": 6,
+    "South Africa": 6,
+    "Nigeria": 6,
+    "Taiwan": 5,
+    "Portugal": 3,
+    "Tunisia": 3,
+    "Sweden": 2,
+    "Russia": 2,
+    "Israel": 2,
+    "Kazakhstan": 2,
+    "Honduras": 2,
+    "Ireland": 2,
+    "Egypt": 2,
+    "China": 1,
+    "Germany": 1,
+    "United Kingdom": 1,
+    "not collected": 1,
+    "Italy": 1,
+    "Thailand": 1
+  },
+  "snp_clusters": 95,
+  "isolates_in_shared_clusters": 7,
+  "drug_results": 1006,
+  "median_seconds_per_isolate": 211.5,
+  "phenotype_note": "Laboratory R/S as submitted to NCBI (CLSI or EUCAST per submitter); intermediate and other categories excluded.",
+  "rules": {
+    "intrinsic_ignored": [
+      "fosA",
+      "oqxA",
+      "oqxB"
+    ],
+    "drug_rules": {
+      "ceftriaxone": "ceph",
+      "cefotaxime": "ceph",
+      "ceftazidime": "ceph",
+      "cefepime": "ceph",
+      "meropenem": "carb",
+      "imipenem": "carb",
+      "ertapenem": "carb",
+      "ciprofloxacin": "QUINOLONE",
+      "levofloxacin": "QUINOLONE",
+      "gentamicin": "GENTAMICIN",
+      "tobramycin": "TOBRAMYCIN",
+      "amikacin": "AMIKACIN",
+      "trimethoprim-sulfamethoxazole": "TRIMETHOPRIM",
+      "tetracycline": "TETRACYCLINE",
+      "colistin": "COLISTIN"
+    }
+  },
+  "rule_based": {
+    "per_drug": {
+      "amikacin": {
+        "all": {
+          "n": 82,
+          "resistant": 26,
+          "susceptible": 56,
+          "TP": 26,
+          "FN": 0,
+          "FP": 26,
+          "TN": 30,
+          "sensitivity": 100.0,
+          "sensitivity_ci": [
+            87.13,
+            100
+          ],
+          "specificity": 53.57,
+          "specificity_ci": [
+            40.7,
+            65.98
+          ],
+          "categorical_agreement": 68.29,
+          "agreement_ci": [
+            57.6,
+            77.35
+          ],
+          "very_major_error_rate": 0.0,
+          "major_error_rate": 46.43
+        },
+        "one_per_cluster": {
+          "n": 78,
+          "resistant": 23,
+          "susceptible": 55,
+          "TP": 23,
+          "FN": 0,
+          "FP": 25,
+          "TN": 30,
+          "sensitivity": 100.0,
+          "sensitivity_ci": [
+            85.69,
+            100
+          ],
+          "specificity": 54.55,
+          "specificity_ci": [
+            41.52,
+            66.97
+          ],
+          "categorical_agreement": 67.95,
+          "agreement_ci": [
+            56.96,
+            77.25
+          ],
+          "very_major_error_rate": 0.0,
+          "major_error_rate": 45.45
+        }
+      },
+      "cefepime": {
+        "all": {
+          "n": 74,
+          "resistant": 53,
+          "susceptible": 21,
+          "TP": 51,
+          "FN": 2,
+          "FP": 11,
+          "TN": 10,
+          "sensitivity": 96.23,
+          "sensitivity_ci": [
+            87.25,
+            98.96
+          ],
+          "specificity": 47.62,
+          "specificity_ci": [
+            28.34,
+            67.63
+          ],
+          "categorical_agreement": 82.43,
+          "agreement_ci": [
+            72.23,
+            89.44
+          ],
+          "very_major_error_rate": 3.77,
+          "major_error_rate": 52.38
+        },
+        "one_per_cluster": {
+          "n": 72,
+          "resistant": 51,
+          "susceptible": 21,
+          "TP": 49,
+          "FN": 2,
+          "FP": 11,
+          "TN": 10,
+          "sensitivity": 96.08,
+          "sensitivity_ci": [
+            86.78,
+            98.92
+          ],
+          "specificity": 47.62,
+          "specificity_ci": [
+            28.34,
+            67.63
+          ],
+          "categorical_agreement": 81.94,
+          "agreement_ci": [
+            71.52,
+            89.13
+          ],
+          "very_major_error_rate": 3.92,
+          "major_error_rate": 52.38
+        }
+      },
+      "cefotaxime": {
+        "all": {
+          "n": 56,
+          "resistant": 49,
+          "susceptible": 7,
+          "TP": 49,
+          "FN": 0,
+          "FP": 1,
+          "TN": 6,
+          "sensitivity": 100.0,
+          "sensitivity_ci": [
+            92.73,
+            100.0
+          ],
+          "specificity": 85.71,
+          "specificity_ci": [
+            48.69,
+            97.43
+          ],
+          "categorical_agreement": 98.21,
+          "agreement_ci": [
+            90.55,
+            99.68
+          ],
+          "very_major_error_rate": 0.0,
+          "major_error_rate": 14.29
+        },
+        "one_per_cluster": {
+          "n": 52,
+          "resistant": 45,
+          "susceptible": 7,
+          "TP": 45,
+          "FN": 0,
+          "FP": 1,
+          "TN": 6,
+          "sensitivity": 100.0,
+          "sensitivity_ci": [
+            92.13,
+            100
+          ],
+          "specificity": 85.71,
+          "specificity_ci": [
+            48.69,
+            97.43
+          ],
+          "categorical_agreement": 98.08,
+          "agreement_ci": [
+            89.88,
+            99.66
+          ],
+          "very_major_error_rate": 0.0,
+          "major_error_rate": 14.29
+        }
+      },
+      "ceftazidime": {
+        "all": {
+          "n": 78,
+          "resistant": 65,
+          "susceptible": 13,
+          "TP": 64,
+          "FN": 1,
+          "FP": 2,
+          "TN": 11,
+          "sensitivity": 98.46,
+          "sensitivity_ci": [
+            91.79,
+            99.73
+          ],
+          "specificity": 84.62,
+          "specificity_ci": [
+            57.76,
+            95.67
+          ],
+          "categorical_agreement": 96.15,
+          "agreement_ci": [
+            89.29,
+            98.68
+          ],
+          "very_major_error_rate": 1.54,
+          "major_error_rate": 15.38
+        },
+        "one_per_cluster": {
+          "n": 74,
+          "resistant": 61,
+          "susceptible": 13,
+          "TP": 60,
+          "FN": 1,
+          "FP": 2,
+          "TN": 11,
+          "sensitivity": 98.36,
+          "sensitivity_ci": [
+            91.28,
+            99.71
+          ],
+          "specificity": 84.62,
+          "specificity_ci": [
+            57.76,
+            95.67
+          ],
+          "categorical_agreement": 95.95,
+          "agreement_ci": [
+            88.75,
+            98.61
+          ],
+          "very_major_error_rate": 1.64,
+          "major_error_rate": 15.38
+        }
+      },
+      "ceftriaxone": {
+        "all": {
+          "n": 63,
+          "resistant": 55,
+          "susceptible": 8,
+          "TP": 53,
+          "FN": 2,
+          "FP": 0,
+          "TN": 8,
+          "sensitivity": 96.36,
+          "sensitivity_ci": [
+            87.68,
+            99.0
+          ],
+          "specificity": 100.0,
+          "specificity_ci": [
+            67.56,
+            100
+          ],
+          "categorical_agreement": 96.83,
+          "agreement_ci": [
+            89.14,
+            99.13
+          ],
+          "very_major_error_rate": 3.64,
+          "major_error_rate": 0.0
+        },
+        "one_per_cluster": {
+          "n": 62,
+          "resistant": 54,
+          "susceptible": 8,
+          "TP": 52,
+          "FN": 2,
+          "FP": 0,
+          "TN": 8,
+          "sensitivity": 96.3,
+          "sensitivity_ci": [
+            87.46,
+            98.98
+          ],
+          "specificity": 100.0,
+          "specificity_ci": [
+            67.56,
+            100
+          ],
+          "categorical_agreement": 96.77,
+          "agreement_ci": [
+            88.98,
+            99.11
+          ],
+          "very_major_error_rate": 3.7,
+          "major_error_rate": 0.0
+        }
+      },
+      "ciprofloxacin": {
+        "all": {
+          "n": 86,
+          "resistant": 62,
+          "susceptible": 24,
+          "TP": 60,
+          "FN": 2,
+          "FP": 5,
+          "TN": 19,
+          "sensitivity": 96.77,
+          "sensitivity_ci": [
+            88.98,
+            99.11
+          ],
+          "specificity": 79.17,
+          "specificity_ci": [
+            59.53,
+            90.76
+          ],
+          "categorical_agreement": 91.86,
+          "agreement_ci": [
+            84.14,
+            96.0
+          ],
+          "very_major_error_rate": 3.23,
+          "major_error_rate": 20.83
+        },
+        "one_per_cluster": {
+          "n": 82,
+          "resistant": 58,
+          "susceptible": 24,
+          "TP": 56,
+          "FN": 2,
+          "FP": 5,
+          "TN": 19,
+          "sensitivity": 96.55,
+          "sensitivity_ci": [
+            88.27,
+            99.05
+          ],
+          "specificity": 79.17,
+          "specificity_ci": [
+            59.53,
+            90.76
+          ],
+          "categorical_agreement": 91.46,
+          "agreement_ci": [
+            83.41,
+            95.8
+          ],
+          "very_major_error_rate": 3.45,
+          "major_error_rate": 20.83
+        }
+      },
+      "colistin": {
+        "all": {
+          "n": 21,
+          "resistant": 7,
+          "susceptible": 14,
+          "TP": 2,
+          "FN": 5,
+          "FP": 1,
+          "TN": 13,
+          "sensitivity": 28.57,
+          "sensitivity_ci": [
+            8.22,
+            64.11
+          ],
+          "specificity": 92.86,
+          "specificity_ci": [
+            68.53,
+            98.73
+          ],
+          "categorical_agreement": 71.43,
+          "agreement_ci": [
+            50.04,
+            86.19
+          ],
+          "very_major_error_rate": 71.43,
+          "major_error_rate": 7.14
+        },
+        "one_per_cluster": {
+          "n": 19,
+          "resistant": 7,
+          "susceptible": 12,
+          "TP": 2,
+          "FN": 5,
+          "FP": 0,
+          "TN": 12,
+          "sensitivity": 28.57,
+          "sensitivity_ci": [
+            8.22,
+            64.11
+          ],
+          "specificity": 100.0,
+          "specificity_ci": [
+            75.75,
+            100
+          ],
+          "categorical_agreement": 73.68,
+          "agreement_ci": [
+            51.21,
+            88.19
+          ],
+          "very_major_error_rate": 71.43,
+          "major_error_rate": 0.0
+        }
+      },
+      "ertapenem": {
+        "all": {
+          "n": 81,
+          "resistant": 52,
+          "susceptible": 29,
+          "TP": 51,
+          "FN": 1,
+          "FP": 2,
+          "TN": 27,
+          "sensitivity": 98.08,
+          "sensitivity_ci": [
+            89.88,
+            99.66
+          ],
+          "specificity": 93.1,
+          "specificity_ci": [
+            78.04,
+            98.09
+          ],
+          "categorical_agreement": 96.3,
+          "agreement_ci": [
+            89.67,
+            98.73
+          ],
+          "very_major_error_rate": 1.92,
+          "major_error_rate": 6.9
+        },
+        "one_per_cluster": {
+          "n": 79,
+          "resistant": 50,
+          "susceptible": 29,
+          "TP": 49,
+          "FN": 1,
+          "FP": 2,
+          "TN": 27,
+          "sensitivity": 98.0,
+          "sensitivity_ci": [
+            89.5,
+            99.65
+          ],
+          "specificity": 93.1,
+          "specificity_ci": [
+            78.04,
+            98.09
+          ],
+          "categorical_agreement": 96.2,
+          "agreement_ci": [
+            89.42,
+            98.7
+          ],
+          "very_major_error_rate": 2.0,
+          "major_error_rate": 6.9
+        }
+      },
+      "gentamicin": {
+        "all": {
+          "n": 82,
+          "resistant": 48,
+          "susceptible": 34,
+          "TP": 44,
+          "FN": 4,
+          "FP": 2,
+          "TN": 32,
+          "sensitivity": 91.67,
+          "sensitivity_ci": [
+            80.45,
+            96.71
+          ],
+          "specificity": 94.12,
+          "specificity_ci": [
+            80.91,
+            98.37
+          ],
+          "categorical_agreement": 92.68,
+          "agreement_ci": [
+            84.94,
+            96.6
+          ],
+          "very_major_error_rate": 8.33,
+          "major_error_rate": 5.88
+        },
+        "one_per_cluster": {
+          "n": 79,
+          "resistant": 46,
+          "susceptible": 33,
+          "TP": 42,
+          "FN": 4,
+          "FP": 2,
+          "TN": 31,
+          "sensitivity": 91.3,
+          "sensitivity_ci": [
+            79.68,
+            96.57
+          ],
+          "specificity": 93.94,
+          "specificity_ci": [
+            80.39,
+            98.32
+          ],
+          "categorical_agreement": 92.41,
+          "agreement_ci": [
+            84.4,
+            96.47
+          ],
+          "very_major_error_rate": 8.7,
+          "major_error_rate": 6.06
+        }
+      },
+      "imipenem": {
+        "all": {
+          "n": 75,
+          "resistant": 48,
+          "susceptible": 27,
+          "TP": 46,
+          "FN": 2,
+          "FP": 8,
+          "TN": 19,
+          "sensitivity": 95.83,
+          "sensitivity_ci": [
+            86.02,
+            98.85
+          ],
+          "specificity": 70.37,
+          "specificity_ci": [
+            51.52,
+            84.15
+          ],
+          "categorical_agreement": 86.67,
+          "agreement_ci": [
+            77.17,
+            92.59
+          ],
+          "very_major_error_rate": 4.17,
+          "major_error_rate": 29.63
+        },
+        "one_per_cluster": {
+          "n": 71,
+          "resistant": 44,
+          "susceptible": 27,
+          "TP": 42,
+          "FN": 2,
+          "FP": 8,
+          "TN": 19,
+          "sensitivity": 95.45,
+          "sensitivity_ci": [
+            84.86,
+            98.74
+          ],
+          "specificity": 70.37,
+          "specificity_ci": [
+            51.52,
+            84.15
+          ],
+          "categorical_agreement": 85.92,
+          "agreement_ci": [
+            75.98,
+            92.17
+          ],
+          "very_major_error_rate": 4.55,
+          "major_error_rate": 29.63
+        }
+      },
+      "levofloxacin": {
+        "all": {
+          "n": 54,
+          "resistant": 37,
+          "susceptible": 17,
+          "TP": 37,
+          "FN": 0,
+          "FP": 7,
+          "TN": 10,
+          "sensitivity": 100.0,
+          "sensitivity_ci": [
+            90.59,
+            100
+          ],
+          "specificity": 58.82,
+          "specificity_ci": [
+            36.01,
+            78.39
+          ],
+          "categorical_agreement": 87.04,
+          "agreement_ci": [
+            75.58,
+            93.58
+          ],
+          "very_major_error_rate": 0.0,
+          "major_error_rate": 41.18
+        },
+        "one_per_cluster": {
+          "n": 53,
+          "resistant": 37,
+          "susceptible": 16,
+          "TP": 37,
+          "FN": 0,
+          "FP": 6,
+          "TN": 10,
+          "sensitivity": 100.0,
+          "sensitivity_ci": [
+            90.59,
+            100
+          ],
+          "specificity": 62.5,
+          "specificity_ci": [
+            38.64,
+            81.52
+          ],
+          "categorical_agreement": 88.68,
+          "agreement_ci": [
+            77.42,
+            94.71
+          ],
+          "very_major_error_rate": 0.0,
+          "major_error_rate": 37.5
+        }
+      },
+      "meropenem": {
+        "all": {
+          "n": 90,
+          "resistant": 55,
+          "susceptible": 35,
+          "TP": 53,
+          "FN": 2,
+          "FP": 5,
+          "TN": 30,
+          "sensitivity": 96.36,
+          "sensitivity_ci": [
+            87.68,
+            99.0
+          ],
+          "specificity": 85.71,
+          "specificity_ci": [
+            70.62,
+            93.74
+          ],
+          "categorical_agreement": 92.22,
+          "agreement_ci": [
+            84.81,
+            96.18
+          ],
+          "very_major_error_rate": 3.64,
+          "major_error_rate": 14.29
+        },
+        "one_per_cluster": {
+          "n": 87,
+          "resistant": 52,
+          "susceptible": 35,
+          "TP": 50,
+          "FN": 2,
+          "FP": 5,
+          "TN": 30,
+          "sensitivity": 96.15,
+          "sensitivity_ci": [
+            87.02,
+            98.94
+          ],
+          "specificity": 85.71,
+          "specificity_ci": [
+            70.62,
+            93.74
+          ],
+          "categorical_agreement": 91.95,
+          "agreement_ci": [
+            84.31,
+            96.05
+          ],
+          "very_major_error_rate": 3.85,
+          "major_error_rate": 14.29
+        }
+      },
+      "tetracycline": {
+        "all": {
+          "n": 38,
+          "resistant": 26,
+          "susceptible": 12,
+          "TP": 19,
+          "FN": 7,
+          "FP": 1,
+          "TN": 11,
+          "sensitivity": 73.08,
+          "sensitivity_ci": [
+            53.92,
+            86.3
+          ],
+          "specificity": 91.67,
+          "specificity_ci": [
+            64.61,
+            98.51
+          ],
+          "categorical_agreement": 78.95,
+          "agreement_ci": [
+            63.65,
+            88.93
+          ],
+          "very_major_error_rate": 26.92,
+          "major_error_rate": 8.33
+        },
+        "one_per_cluster": {
+          "n": 37,
+          "resistant": 25,
+          "susceptible": 12,
+          "TP": 19,
+          "FN": 6,
+          "FP": 1,
+          "TN": 11,
+          "sensitivity": 76.0,
+          "sensitivity_ci": [
+            56.57,
+            88.5
+          ],
+          "specificity": 91.67,
+          "specificity_ci": [
+            64.61,
+            98.51
+          ],
+          "categorical_agreement": 81.08,
+          "agreement_ci": [
+            65.79,
+            90.52
+          ],
+          "very_major_error_rate": 24.0,
+          "major_error_rate": 8.33
+        }
+      },
+      "tobramycin": {
+        "all": {
+          "n": 55,
+          "resistant": 41,
+          "susceptible": 14,
+          "TP": 37,
+          "FN": 4,
+          "FP": 0,
+          "TN": 14,
+          "sensitivity": 90.24,
+          "sensitivity_ci": [
+            77.45,
+            96.14
+          ],
+          "specificity": 100.0,
+          "specificity_ci": [
+            78.47,
+            100
+          ],
+          "categorical_agreement": 92.73,
+          "agreement_ci": [
+            82.74,
+            97.14
+          ],
+          "very_major_error_rate": 9.76,
+          "major_error_rate": 0.0
+        },
+        "one_per_cluster": {
+          "n": 55,
+          "resistant": 41,
+          "susceptible": 14,
+          "TP": 37,
+          "FN": 4,
+          "FP": 0,
+          "TN": 14,
+          "sensitivity": 90.24,
+          "sensitivity_ci": [
+            77.45,
+            96.14
+          ],
+          "specificity": 100.0,
+          "specificity_ci": [
+            78.47,
+            100
+          ],
+          "categorical_agreement": 92.73,
+          "agreement_ci": [
+            82.74,
+            97.14
+          ],
+          "very_major_error_rate": 9.76,
+          "major_error_rate": 0.0
+        }
+      },
+      "trimethoprim-sulfamethoxazole": {
+        "all": {
+          "n": 71,
+          "resistant": 56,
+          "susceptible": 15,
+          "TP": 54,
+          "FN": 2,
+          "FP": 4,
+          "TN": 11,
+          "sensitivity": 96.43,
+          "sensitivity_ci": [
+            87.88,
+            99.02
+          ],
+          "specificity": 73.33,
+          "specificity_ci": [
+            48.05,
+            89.1
+          ],
+          "categorical_agreement": 91.55,
+          "agreement_ci": [
+            82.76,
+            96.07
+          ],
+          "very_major_error_rate": 3.57,
+          "major_error_rate": 26.67
+        },
+        "one_per_cluster": {
+          "n": 68,
+          "resistant": 53,
+          "susceptible": 15,
+          "TP": 52,
+          "FN": 1,
+          "FP": 4,
+          "TN": 11,
+          "sensitivity": 98.11,
+          "sensitivity_ci": [
+            90.06,
+            99.67
+          ],
+          "specificity": 73.33,
+          "specificity_ci": [
+            48.05,
+            89.1
+          ],
+          "categorical_agreement": 92.65,
+          "agreement_ci": [
+            83.91,
+            96.82
+          ],
+          "very_major_error_rate": 1.89,
+          "major_error_rate": 26.67
+        }
+      }
+    },
+    "pooled_all": {
+      "n": 1006,
+      "resistant": 680,
+      "susceptible": 326,
+      "TP": 646,
+      "FN": 34,
+      "FP": 75,
+      "TN": 251,
+      "sensitivity": 95.0,
+      "sensitivity_ci": [
+        93.09,
+        96.4
+      ],
+      "specificity": 76.99,
+      "specificity_ci": [
+        72.13,
+        81.23
+      ],
+      "categorical_agreement": 89.17,
+      "agreement_ci": [
+        87.09,
+        90.94
+      ],
+      "very_major_error_rate": 5.0,
+      "major_error_rate": 23.01
+    },
+    "pooled_one_per_cluster": {
+      "n": 968,
+      "resistant": 647,
+      "susceptible": 321,
+      "TP": 615,
+      "FN": 32,
+      "FP": 72,
+      "TN": 249,
+      "sensitivity": 95.05,
+      "sensitivity_ci": [
+        93.1,
+        96.48
+      ],
+      "specificity": 77.57,
+      "specificity_ci": [
+        72.7,
+        81.79
+      ],
+      "categorical_agreement": 89.26,
+      "agreement_ci": [
+        87.15,
+        91.05
+      ],
+      "very_major_error_rate": 4.95,
+      "major_error_rate": 22.43
+    }
+  },
+  "machine_learning": {
+    "features": 194,
+    "model": "L2 logistic regression, class_weight=balanced, C=1.0",
+    "folds": 5,
+    "repeats": 10,
+    "drugs": {
+      "ceftazidime": {
+        "random": {
+          "balanced_accuracy_mean": 85.0,
+          "balanced_accuracy_sd": 1.92,
+          "auc_mean": 0.938
+        },
+        "cluster_aware": {
+          "balanced_accuracy_mean": 84.92,
+          "balanced_accuracy_sd": 2.21,
+          "auc_mean": 0.938
+        },
+        "n": 78,
+        "resistant": 65,
+        "clusters": 74,
+        "inflation_pp": 0.08
+      },
+      "cefepime": {
+        "random": {
+          "balanced_accuracy_mean": 73.78,
+          "balanced_accuracy_sd": 4.26,
+          "auc_mean": 0.838
+        },
+        "cluster_aware": {
+          "balanced_accuracy_mean": 72.83,
+          "balanced_accuracy_sd": 3.5,
+          "auc_mean": 0.842
+        },
+        "n": 74,
+        "resistant": 53,
+        "clusters": 72,
+        "inflation_pp": 0.95
+      },
+      "meropenem": {
+        "random": {
+          "balanced_accuracy_mean": 78.52,
+          "balanced_accuracy_sd": 1.96,
+          "auc_mean": 0.868
+        },
+        "cluster_aware": {
+          "balanced_accuracy_mean": 79.1,
+          "balanced_accuracy_sd": 2.21,
+          "auc_mean": 0.865
+        },
+        "n": 90,
+        "resistant": 55,
+        "clusters": 87,
+        "inflation_pp": -0.58
+      },
+      "imipenem": {
+        "random": {
+          "balanced_accuracy_mean": 73.9,
+          "balanced_accuracy_sd": 3.54,
+          "auc_mean": 0.849
+        },
+        "cluster_aware": {
+          "balanced_accuracy_mean": 73.82,
+          "balanced_accuracy_sd": 3.78,
+          "auc_mean": 0.852
+        },
+        "n": 75,
+        "resistant": 48,
+        "clusters": 71,
+        "inflation_pp": 0.08
+      },
+      "ertapenem": {
+        "random": {
+          "balanced_accuracy_mean": 82.53,
+          "balanced_accuracy_sd": 1.68,
+          "auc_mean": 0.909
+        },
+        "cluster_aware": {
+          "balanced_accuracy_mean": 82.89,
+          "balanced_accuracy_sd": 1.8,
+          "auc_mean": 0.915
+        },
+        "n": 81,
+        "resistant": 52,
+        "clusters": 79,
+        "inflation_pp": -0.36
+      },
+      "ciprofloxacin": {
+        "random": {
+          "balanced_accuracy_mean": 85.48,
+          "balanced_accuracy_sd": 1.14,
+          "auc_mean": 0.916
+        },
+        "cluster_aware": {
+          "balanced_accuracy_mean": 84.82,
+          "balanced_accuracy_sd": 1.46,
+          "auc_mean": 0.92
+        },
+        "n": 86,
+        "resistant": 62,
+        "clusters": 82,
+        "inflation_pp": 0.66
+      },
+      "levofloxacin": {
+        "random": {
+          "balanced_accuracy_mean": 81.49,
+          "balanced_accuracy_sd": 2.93,
+          "auc_mean": 0.889
+        },
+        "cluster_aware": {
+          "balanced_accuracy_mean": 78.55,
+          "balanced_accuracy_sd": 1.51,
+          "auc_mean": 0.846
+        },
+        "n": 54,
+        "resistant": 37,
+        "clusters": 53,
+        "inflation_pp": 2.94
+      },
+      "gentamicin": {
+        "random": {
+          "balanced_accuracy_mean": 80.06,
+          "balanced_accuracy_sd": 2.17,
+          "auc_mean": 0.885
+        },
+        "cluster_aware": {
+          "balanced_accuracy_mean": 80.47,
+          "balanced_accuracy_sd": 1.99,
+          "auc_mean": 0.88
+        },
+        "n": 82,
+        "resistant": 48,
+        "clusters": 79,
+        "inflation_pp": -0.41
+      },
+      "tobramycin": {
+        "random": {
+          "balanced_accuracy_mean": 86.31,
+          "balanced_accuracy_sd": 2.74,
+          "auc_mean": 0.942
+        },
+        "cluster_aware": {
+          "balanced_accuracy_mean": 85.23,
+          "balanced_accuracy_sd": 2.69,
+          "auc_mean": 0.945
+        },
+        "n": 55,
+        "resistant": 41,
+        "clusters": 55,
+        "inflation_pp": 1.08
+      },
+      "amikacin": {
+        "random": {
+          "balanced_accuracy_mean": 87.17,
+          "balanced_accuracy_sd": 2.19,
+          "auc_mean": 0.929
+        },
+        "cluster_aware": {
+          "balanced_accuracy_mean": 88.43,
+          "balanced_accuracy_sd": 2.62,
+          "auc_mean": 0.95
+        },
+        "n": 82,
+        "resistant": 26,
+        "clusters": 78,
+        "inflation_pp": -1.26
+      },
+      "trimethoprim-sulfamethoxazole": {
+        "random": {
+          "balanced_accuracy_mean": 76.52,
+          "balanced_accuracy_sd": 1.62,
+          "auc_mean": 0.849
+        },
+        "cluster_aware": {
+          "balanced_accuracy_mean": 77.51,
+          "balanced_accuracy_sd": 2.35,
+          "auc_mean": 0.842
+        },
+        "n": 71,
+        "resistant": 56,
+        "clusters": 68,
+        "inflation_pp": -0.99
+      },
+      "tetracycline": {
+        "random": {
+          "balanced_accuracy_mean": 55.51,
+          "balanced_accuracy_sd": 6.22,
+          "auc_mean": 0.624
+        },
+        "cluster_aware": {
+          "balanced_accuracy_mean": 51.89,
+          "balanced_accuracy_sd": 3.81,
+          "auc_mean": 0.613
+        },
+        "n": 38,
+        "resistant": 26,
+        "clusters": 37,
+        "inflation_pp": 3.62
+      }
+    }
+  }
+}

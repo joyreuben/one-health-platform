@@ -4,7 +4,7 @@
 
 A research and surveillance web app that brings genomic and epidemic signals together under a One Health lens:
 
-1. **Genomic AMR Surveillance.** Paste a DNA or protein sequence, or upload FASTA files. NCBI AMRFinderPlus finds the antimicrobial-resistance genes it carries, the app scores the evidence and produces an HL7 v2.5 lab report.
+1. **Genomic AMR Surveillance.** Paste a DNA or protein sequence, upload FASTA files, or upload a whole-genome assembly. NCBI AMRFinderPlus finds the antimicrobial-resistance genes (and, with the organism set, point mutations) it carries; the app scores the evidence, predicts susceptibility for *Klebsiella pneumoniae*, and produces an HL7 v2.5 lab report.
 2. **Epidemic Early Warning.** Paste a health article or alert. It is screened for misinformation, then Claude extracts the disease, case count, trend and location, and the app rates the outbreak risk and produces an HL7 v2.5 alert.
 3. **Outbreak Feed.** WHO Disease Outbreak News is fetched automatically and run through the same pipeline.
 4. **Dashboard and Audit Trail.** Every analysis is saved to a database, plotted over time and on a world map, and can be reopened or exported.
@@ -97,7 +97,7 @@ logs/             Created at runtime: Claude raw-response debug log (git-ignored
 | Page | What it does |
 |---|---|
 | **Home** | Overview of the platform and links to each tool. |
-| **Genomic** | Single sequence or FASTA batch. Shows every resistance gene found, drug class, confidence, and the HL7 report. Engine and BLAST threshold are under *Search settings*. |
+| **Genomic** | Single sequence, FASTA batch (each record separately), or whole-genome assembly (all contigs as one isolate). Shows every resistance gene and mutation found, drug class, confidence, predicted susceptibility for *K. pneumoniae*, and the HL7 report. Organism, engine and BLAST threshold are under *Search settings*. |
 | **Epidemic** | Paste an article or pick a demo. Credibility verdict, then risk analysis and HL7 alert. Fake or likely-fake articles are blocked from scoring. |
 | **Outbreak Feed** | Latest WHO reports with status, analysis results and a manual *Fetch latest now* button. |
 | **Dashboard** | Totals, confidence timeline, and a world map of geocoded reports. |
@@ -122,7 +122,13 @@ Drug classes are mapped to a concern level: carbapenem, colistin, vancomycin, me
 
 **Fallback: web BLAST.** Used when AMRFinderPlus is unavailable, or when chosen in *Search settings*. Hits from NCBI's public BLAST service are classified by matching hit titles against a small list of gene-name patterns, then an Entrez lookup, then a sequence motif scan. This path is slow and far less reliable; treat its results as indicative only.
 
-A negative AMRFinderPlus result means no match in the reference database. It does not prove susceptibility: organism-specific point mutations are not searched (that needs the organism to be specified) and novel genes are not covered.
+**Organism.** Choosing the organism under *Search settings* passes it to AMRFinderPlus (`-O`), which adds organism-specific point-mutation screening (for example *gyrA*, *parC*, *ompK35/36* in *K. pneumoniae*) and hides genes intrinsic to that species. Without it, only acquired genes are reported.
+
+**Whole genomes.** An uploaded assembly of up to 20 Mb is screened in one AMRFinderPlus call using all CPU cores, typically in 1–5 minutes. The single-sequence box keeps its 500,000-base limit.
+
+**Predicted susceptibility.** For *K. pneumoniae* genomes the app predicts resistant/susceptible for 15 antibiotics with fixed rules (`PHENOTYPE_DRUG_RULES` and `predict_phenotype` in `code/engine.py`). The same code was validated against laboratory results on 99 public clinical isolates (89.2% agreement; see [evaluation/RESULTS.md](evaluation/RESULTS.md), section 4). It is not shown for other species, where it has not been validated, and it does not replace laboratory testing.
+
+A negative AMRFinderPlus result means no match in the reference database. It does not prove susceptibility: novel genes are not covered, and point mutations are searched only when the organism is set.
 
 ## How epidemic analysis works
 
@@ -151,17 +157,18 @@ A background thread fetches the ten newest WHO Disease Outbreak News items a few
 python -m unittest discover -s code/tests -t code
 ```
 
-53 offline tests cover sequence validation, AMRFinderPlus output parsing and interpretation, the BLAST-title classifier, scoring, HL7 formatting and escaping, the credibility heuristic, Claude response parsing and retries, the epidemic pipeline, storage and feed parsing. They make no network, Claude or AMRFinderPlus calls. The app also runs them at start-up and shows the result on the Status page.
+72 offline tests cover sequence and genome validation, AMRFinderPlus output parsing and interpretation, the organism option, the genome pipeline, the susceptibility rules, the BLAST-title classifier, scoring, HL7 formatting and escaping, the credibility heuristic, Claude response parsing and retries, the epidemic pipeline, storage and feed parsing. They make no network, Claude or AMRFinderPlus calls. The app also runs them at start-up and shows the result on the Status page.
 
 ## Evaluation
 
-Benchmarks and their results are in [`evaluation/`](evaluation/RESULTS.md). In brief: 98.9% of 3,212 ResFinder resistance genes were detected with 99.9% agreement on drug class and no calls on 7,530 negative-control sequences; the offline misinformation rules block 26.5% of fake posts while passing 97.4% of real ones; the Claude-based stages have not been evaluated yet. Read the limitations there before quoting any figure.
+Benchmarks and their results are in [`evaluation/`](evaluation/RESULTS.md). In brief: 98.9% of 3,212 ResFinder resistance genes were detected with 99.9% agreement on drug class and no calls on 7,530 negative-control sequences; on 99 public clinical *K. pneumoniae* genomes, predicted resistance agreed with laboratory results in 89.2% of 1,006 isolate–drug tests (sensitivity 95.0%, specificity 77.0%); the offline misinformation rules block 26.5% of fake posts while passing 97.4% of real ones; the Claude-based stages have not been evaluated yet. Read the limitations there before quoting any figure.
 
 ## Known limitations
 
-- Detection has been benchmarked on reference gene sequences only, not on isolates with known resistance profiles or laboratory susceptibility results.
-- Input is single sequences or FASTA. Raw reads (FASTQ) and assembly are not supported.
-- Point-mutation resistance is not reported because the organism is not passed to AMRFinderPlus.
+- Genotype–phenotype agreement has been measured for one species (*K. pneumoniae*, 99 public genomes) only.
+- Raw sequencing reads (FASTQ) are not supported; genomes must be assembled first.
+- Predicted susceptibility exists for *K. pneumoniae* only, and is weak for amikacin, cefepime, colistin and tetracycline.
+- A whole-genome analysis runs inside the web request; the page waits until it finishes.
 - The risk score is a model estimate from one article, not a statistical outbreak detection against a baseline.
 - No authentication, roles or per-organisation data separation.
 - HL7 messages are structurally valid v2.5 ORU^R01 but use local codes, not LOINC.
