@@ -1,6 +1,6 @@
 # Evaluation results
 
-One Health Intelligence Platform v4.0.0 · run on 2026-11-15 · random seed 20261115
+One Health Intelligence Platform v4.0.0 · sections 1–3 run on 2026-11-15 (seed 20261115) · section 4 run 2026-11-17 to 2026-11-19 (seed 20261117)
 
 This document reports what was measured, how, and what the numbers do and do not show. All intervals are 95% Wilson score intervals. Raw outputs are in `evaluation/results/`.
 
@@ -18,6 +18,8 @@ This document reports what was measured, how, and what the numbers do and do not
 | | 149 WHO outbreak reports | 0 wrongly blocked (CI 0–2.5%) |
 | Outbreak extraction, keyword fallback | 149 WHO outbreak reports | Disease correct in 18.1% (27); location never extracted |
 | Outbreak extraction, Claude | | **Not evaluated: no API key was available** |
+| Genotype → phenotype, clinical isolates | 99 public *K. pneumoniae* genomes, 1,006 isolate–drug lab results, 15 drugs | Categorical agreement 89.2% (CI 87.1–90.9); sensitivity for resistance 95.0% (CI 93.1–96.4); specificity 77.0% (CI 72.1–81.2) |
+| | One isolate per clonal group (95 SNP clusters) | Agreement 89.3%; essentially unchanged |
 
 ## 1. Resistance-gene detection
 
@@ -166,13 +168,96 @@ WHO report titles follow the pattern "Disease - Country". The title was parsed i
 
 The keyword fallback recognises only Ebola, COVID-19 and mpox, and never extracts a location. This is the baseline against which the Claude extractor should be compared.
 
+## 4. Genotype–phenotype validation on clinical isolates
+
+### Method
+
+- **Data.** NCBI Pathogen Detection, *Klebsiella* group (PDG000000012.2582, downloaded 2026-11-17). Eligible: *K. pneumoniae*, a genome assembly, a human host or clinical source, and laboratory resistant/susceptible results for at least 3 of the 15 study drugs. 1,002 isolates were eligible.
+- **Sample.** At most 8 isolates per BioProject (to spread the sample across laboratories), then 100 drawn at random (seed 20261117). 99 were analysed; one (GCA_004322995.1) did not finish within the 60-minute limit. The 99 come from 43 BioProjects and at least 20 countries (13 without a recorded country), collected 2003–2025 (26 without a date).
+- **Genotype.** Each assembly was downloaded from NCBI and run through the platform's AMRFinderPlus module (`AMRFinderClient.run`, nucleotide mode) with the organism set to *Klebsiella_pneumoniae*, which adds point-mutation screening. AMRFinderPlus 4.2.7, database 2026-10-29.1. NCBI's own precomputed genotypes were not used.
+- **Phenotype.** The resistant (R) or susceptible (S) result as submitted to NCBI. Submitters used CLSI or EUCAST breakpoints of different years. Intermediate and other categories were excluded. 1,006 isolate–drug results: 680 R, 326 S.
+- **Prediction rules.** Fixed in `isolate_benchmark.py` before results were seen. Genes and mutations are mapped to drugs through the AMRFinderPlus subclass: cephalosporins are predicted resistant from an acquired ESBL, AmpC or carbapenemase gene; carbapenems from a carbapenemase gene, or a porin (OmpK35/36) disruption together with an ESBL/AmpC gene; quinolones, aminoglycosides, trimethoprim-sulfamethoxazole (from *dfr*), tetracycline and colistin from any element of the matching subclass. Calls with an internal stop codon and the chromosomal genes intrinsic to *K. pneumoniae* (*oqxA*, *oqxB*, *fosA*) are ignored.
+- **Clonal structure.** Isolates were grouped by NCBI SNP cluster; isolates outside any cluster form their own group.
+
+### Correction made after the first run
+
+The first version of the script compared intrinsic gene names exactly, but AMRFinderPlus reports allele variants (*oqxB5*, *oqxA11*, *fosA5*). The pre-specified exclusion therefore never applied, and *oqxB* alone produced false resistant calls for quinolones. The comparison was corrected to match variants and the cached AMRFinderPlus results were re-analysed; nothing else changed. Both outputs are kept:
+
+| | Sensitivity | Specificity | Categorical agreement |
+|---|---|---|---|
+| As first run (`results/isolate_*_as_run_v1.*`) | 95.2% | 71.8% | 87.6% |
+| Corrected (reported below) | 95.0% | 77.0% | 89.2% |
+
+Only ciprofloxacin and levofloxacin results changed.
+
+### Results by drug
+
+Sensitivity is for detecting resistance. Very major error (VME) = resistant isolate predicted susceptible; major error (ME) = susceptible isolate predicted resistant.
+
+| Drug | n | R | Sensitivity (CI) | Specificity (CI) | Agreement | VME | ME |
+|---|---|---|---|---|---|---|---|
+| Ceftriaxone | 63 | 55 | 96.4% (87.7–99.0) | 100% (67.6–100) | 96.8% | 3.6% | 0% |
+| Cefotaxime | 56 | 49 | 100% (92.7–100) | 85.7% (48.7–97.4) | 98.2% | 0% | 14.3% |
+| Ceftazidime | 78 | 65 | 98.5% (91.8–99.7) | 84.6% (57.8–95.7) | 96.2% | 1.5% | 15.4% |
+| Cefepime | 74 | 53 | 96.2% (87.3–99.0) | 47.6% (28.3–67.6) | 82.4% | 3.8% | 52.4% |
+| Meropenem | 90 | 55 | 96.4% (87.7–99.0) | 85.7% (70.6–93.7) | 92.2% | 3.6% | 14.3% |
+| Imipenem | 75 | 48 | 95.8% (86.0–98.9) | 70.4% (51.5–84.2) | 86.7% | 4.2% | 29.6% |
+| Ertapenem | 81 | 52 | 98.1% (89.9–99.7) | 93.1% (78.0–98.1) | 96.3% | 1.9% | 6.9% |
+| Ciprofloxacin | 86 | 62 | 96.8% (89.0–99.1) | 79.2% (59.5–90.8) | 91.9% | 3.2% | 20.8% |
+| Levofloxacin | 54 | 37 | 100% (90.6–100) | 58.8% (36.0–78.4) | 87.0% | 0% | 41.2% |
+| Gentamicin | 82 | 48 | 91.7% (80.5–96.7) | 94.1% (80.9–98.4) | 92.7% | 8.3% | 5.9% |
+| Tobramycin | 55 | 41 | 90.2% (77.5–96.1) | 100% (78.5–100) | 92.7% | 9.8% | 0% |
+| Amikacin | 82 | 26 | 100% (87.1–100) | 53.6% (40.7–66.0) | 68.3% | 0% | 46.4% |
+| Trimethoprim-sulfamethoxazole | 71 | 56 | 96.4% (87.9–99.0) | 73.3% (48.1–89.1) | 91.5% | 3.6% | 26.7% |
+| Tetracycline | 38 | 26 | 73.1% (53.9–86.3) | 91.7% (64.6–98.5) | 79.0% | 26.9% | 8.3% |
+| Colistin | 21 | 7 | 28.6% (8.2–64.1) | 92.9% (68.5–98.7) | 71.4% | 71.4% | 7.1% |
+| **Pooled** | **1,006** | **680** | **95.0% (93.1–96.4)** | **77.0% (72.1–81.2)** | **89.2% (87.1–90.9)** | **5.0%** | **23.0%** |
+| One isolate per SNP cluster | 968 | 647 | 95.1% (93.1–96.5) | 77.6% (72.7–81.8) | 89.3% (87.2–91.1) | 5.0% | 22.4% |
+
+### Where the errors come from
+
+- **False resistant calls** are dominated by *aac(6')-Ib-cr*, which AMRFinderPlus assigns to amikacin: of the 26 amikacin-susceptible isolates wrongly called resistant, 21 had *aac(6')-Ib-cr5* as the only determinant and 2 had *aac(6')-Ib*. This enzyme usually raises amikacin MICs without crossing the breakpoint. Cefepime false positives come from ESBLs in isolates still testing susceptible to cefepime. A few carbapenem false positives come from porin disruption plus ESBL, and from blaOXA-48, which hydrolyses imipenem weakly.
+- **Missed resistance** concentrates in colistin (5 of 7 resistant isolates had no known determinant; colistin resistance in *K. pneumoniae* often comes from *mgrB* disruption by insertion sequences, which AMRFinderPlus does not report) and tetracycline (7 of 26).
+- A per-drug rule refinement (for example, not counting *aac(6')-Ib* for amikacin) would reduce major errors, but was not applied: changing rules after seeing these results would overstate performance. It should be tested on a separate set of isolates.
+
+### Clonal structure and cross-validation
+
+The 99 isolates fell into 95 SNP clusters; only 7 shared a cluster with another sampled isolate, because sampling was capped per BioProject. Keeping one isolate per cluster changed pooled agreement by 0.1 percentage points.
+
+A logistic regression on gene and mutation presence (12 drugs with ≥10 resistant and ≥10 susceptible isolates; 5-fold, 10 repeats) was evaluated with random and with cluster-aware folds:
+
+| Drug | Random CV balanced accuracy | Cluster-aware | Difference |
+|---|---|---|---|
+| Ceftazidime | 85.0% | 84.9% | +0.1 |
+| Cefepime | 73.8% | 72.8% | +1.0 |
+| Meropenem | 78.5% | 79.1% | −0.6 |
+| Imipenem | 73.9% | 73.8% | +0.1 |
+| Ertapenem | 82.5% | 82.9% | −0.4 |
+| Ciprofloxacin | 85.5% | 84.8% | +0.7 |
+| Levofloxacin | 81.5% | 78.6% | +2.9 |
+| Gentamicin | 80.1% | 80.5% | −0.4 |
+| Tobramycin | 86.3% | 85.2% | +1.1 |
+| Amikacin | 87.2% | 88.4% | −1.3 |
+| Trimethoprim-sulfamethoxazole | 76.5% | 77.5% | −1.0 |
+| Tetracycline | 55.5% | 51.9% | +3.6 |
+
+The differences are small and in both directions. **This sample does not show clonal leakage**, because it contains almost no clonal pairs; that is a consequence of the sampling design, not evidence that leakage is unimportant. Testing leakage needs a sample with real clonal structure, such as whole outbreak collections. The learned model did not outperform the fixed rules and is reported only for this comparison.
+
+### Speed
+
+Median 212 s per genome with 2 CPU threads, 4 genomes in parallel, through WSL on an 8-core laptop.
+
+### Reading
+
+On public clinical *K. pneumoniae*, the platform's AMRFinderPlus module found a known determinant for 95% of laboratory-confirmed resistance, with the best results for third-generation cephalosporins, carbapenems (meropenem, ertapenem) and gentamicin/tobramycin. Specificity is lower, mainly because the presence of a gene does not always mean resistance above the clinical breakpoint. Colistin and tetracycline are poorly predicted.
+
 ## What has not been evaluated
 
 - **Every Claude-based stage:** credibility assessment, outbreak extraction, and the risk score. The script supports this (`--with-claude`) but needs an API key and is billed to it.
 - **The risk score** has no reference standard in this evaluation, with or without Claude.
-- **Whole genomes and real isolates.** All genomic tests used single gene sequences. The platform does not accept sequences over 500,000 bases, raw reads or assemblies.
-- **Agreement with laboratory susceptibility results.** Nothing here measures whether a detected gene predicts phenotypic resistance.
-- **Point-mutation resistance,** which requires specifying the organism.
+- **The app's upload screen itself.** Section 4 called the platform's AMRFinderPlus client directly. The app's whole-genome upload (added afterwards) uses the same client, organism setting and prediction rules (`engine.predict_phenotype`; the benchmark imports it, and re-running it reproduced every prediction exactly). One assembly was also checked end to end through the upload path: identical AMR findings.
+- **Species other than *K. pneumoniae*,** and isolates from other sources (animal, food, environment).
+- **Raw sequencing reads (FASTQ).**
 - **The web BLAST fallback path.**
 - **Use by real users,** including usability and time saved.
 
@@ -183,6 +268,8 @@ The keyword fallback recognises only Ebola, COVID-19 and mpox, and never extract
 - CONSTRAINT posts are short social-media texts about one disease. The rules were designed for article-length reports, so performance on news articles may differ in either direction.
 - The WHO answer key was produced by parsing titles automatically, and string matching can both over- and under-credit an extractor.
 - WHO reports are well-written official documents; results on them say nothing about noisy or local-language sources.
+- Section 4 phenotypes were submitted by many laboratories using different breakpoint standards and years, and were not re-interpreted against one standard. Public isolates with AST data over-represent resistant and outbreak isolates (68% of results were resistant). 99 isolates give wide intervals for individual drugs, especially specificity and colistin.
+- These are public genomes that NCBI already screens with AMRFinderPlus. The reference catalogue may have been informed by some of them, so performance on new genomes could differ.
 
 ## Reproducing
 
@@ -192,7 +279,11 @@ python evaluation/download_data.py            # public datasets into evaluation/
 python evaluation/amr_benchmark.py            # about 15 minutes; resumable
 python evaluation/epidemic_benchmark.py       # under a minute
 python evaluation/epidemic_benchmark.py --with-claude   # optional; needs ANTHROPIC_API_KEY
+pip install scikit-learn                      # for section 4 only
+python evaluation/isolate_benchmark.py --n 100 --workers 4 --threads 2   # several hours; resumable
 ```
+
+Section 4 needs two files from NCBI Pathogen Detection in `evaluation/data/isolates/`: the *Klebsiella* metadata TSV saved as `kleb.metadata.tsv` (`/pathogen/Results/Klebsiella/latest_snps/Metadata/`) and the SNP cluster list saved as `kleb.clusters.tsv` (`.../Clusters/*.cluster_list.tsv`). NCBI replaces these files regularly; this run used release PDG000000012.2582, and the selected isolates are listed in `results/isolate_selection.csv`.
 
 The 35-gene `--plus` re-run and the K-12 intrinsic-gene check were done separately; the first is saved as `results/amr_missed_genes_plus_scope.json`.
 
@@ -205,5 +296,6 @@ The 35-gene `--plus` re-run and the K-12 intrinsic-gene check were done separate
 | *E. coli* K-12 MG1655 | NC_000913.3 | NCBI RefSeq | Public domain |
 | CONSTRAINT-2021 COVID-19 Fake News | train, val, test | github.com/diptamath/covid_fake_news | Check the repository's terms before redistributing |
 | WHO Disease Outbreak News | 149 reports, 2024–2026 | who.int public API | WHO terms of use apply |
+| NCBI Pathogen Detection, *Klebsiella* | PDG000000012.2582 (metadata, SNP clusters, 99 assemblies) | ncbi.nlm.nih.gov/pathogens | Public domain; cite the submitting BioProjects where required |
 
 Cite the original publications for ResFinder, AMRFinderPlus and CONSTRAINT in any manuscript.

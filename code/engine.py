@@ -522,14 +522,24 @@ class AMRFinderClient:
         return out
 
     @classmethod
-    def run(cls, records: Dict[str, str], protein: bool) -> Dict[str, List[Dict[str, Any]]]:
+    def run(cls, records: Dict[str, str], protein: bool, organism: Optional[str] = None,
+            timeout: Optional[int] = None, threads: Optional[int] = None) -> Dict[str, List[Dict[str, Any]]]:
         """Analyse several sequences in one call. `records` maps a
-        whitespace-free id to a cleaned sequence. Returns id -> findings."""
+        whitespace-free id to a cleaned sequence. Returns id -> findings.
+        `organism` is an AMRFinderPlus organism name (see `amrfinder -l`,
+        e.g. "Klebsiella_pneumoniae"); it enables point-mutation screening
+        for that organism."""
         if not records:
             return {}
         fasta = "".join(f">{rid}\n{seq}\n" for rid, seq in records.items())
         flag = "-p" if protein else "-n"
-        rc, out, err = cls._exec(f"{flag} @FASTA@ --threads {cls.THREADS}", fasta=fasta)
+        org = ""
+        if organism:
+            if not re.fullmatch(r"[A-Za-z_]{3,60}", organism):
+                raise ValueError(f"Invalid AMRFinderPlus organism name: {organism!r}")
+            org = f" -O {organism}"
+        rc, out, err = cls._exec(f"{flag} @FASTA@{org} --threads {threads or cls.THREADS}",
+                                 fasta=fasta, timeout=timeout)
         if rc != 0:
             tail = " ".join(err.strip().splitlines()[-3:])[:300]
             raise RuntimeError(f"AMRFinderPlus failed (exit {rc}): {tail}")
@@ -1452,6 +1462,34 @@ class HL7Generator:
         ])
 
     @classmethod
+    def amr_genome_report(cls, sample_id, organism, findings, phenotype=None):
+        """ORU^R01 for a whole-genome result: one OBX per resistance
+        determinant and, when available, one per predicted drug result."""
+        ts  = datetime.now().strftime("%Y%m%d%H%M%S")
+        mid = hashlib.md5(f"{sample_id}{ts}".encode()).hexdigest()[:13]
+        sf  = cls._sf
+        lines = [
+            f"MSH|^~\\&|ONE_HEALTH_PLATFORM|REGIONAL_HUB|LABORATORY_IS|HOSPITAL_SYSTEM|{ts}||ORU^R01|{mid}|P|2.5",
+            f"PID|1||{sf(sample_id)}^^^MRN||PATIENT^ANONYMOUS|||||||||||||||||||||||||||",
+            f"OBR|1||{sf(sample_id)}|AMR_WGS^Antimicrobial Resistance Genome Screen|F|||{ts}||||||||||||||||F",
+            f"OBX|1|ST|ORGANISM^Organism (as specified)|1|{sf(organism or 'not specified')}||||N|||F",
+        ]
+        n = 1
+        for f in findings:
+            n += 1
+            concern = AMRFinderClient.concern(f.get("class", ""), f.get("subclass", ""))
+            flag = "H" if concern in ("CRITICAL", "HIGH") else "N"
+            # components escaped individually, then joined with the ^ separator
+            value = "^".join(sf(c) for c in (f["symbol"], f.get("subclass") or f.get("class") or "",
+                                              f.get("method", ""), f"{f.get('identity', 0):.2f}"))
+            lines.append(f"OBX|{n}|CWE|AMR_DETERMINANT^Resistance determinant|{n - 1}|{value}|||{flag}|||F")
+        for p in phenotype or []:
+            n += 1
+            lines.append(f"OBX|{n}|ST|PREDICTED_SUSCEPTIBILITY^{sf(p['drug'])} predicted from genotype|1|"
+                         f"{'R' if p['predicted_resistant'] else 'S'}||||{'H' if p['predicted_resistant'] else 'N'}|||P")
+        return "\n".join(lines)
+
+    @classmethod
     def epidemic_alert(cls, report_id, disease, risk_score, cases, trend, location):
         ts  = datetime.now().strftime("%Y%m%d%H%M%S")
         mid = hashlib.md5(f"{report_id}{ts}".encode()).hexdigest()[:13]
@@ -1480,6 +1518,98 @@ ENGINE_MODES = {
     "blast":           "Web BLAST only (slow, 1–5 min)",
 }
 
+# AMRFinderPlus --organism values (amrfinder -l, v4.2.7). Setting one adds
+# organism-specific point-mutation screening and suppresses genes intrinsic
+# to that organism.
+AMR_ORGANISMS = {"": "Not specified (acquired genes only)"}
+AMR_ORGANISMS.update({o: o.replace("_", " ") + (" / Shigella" if o == "Escherichia" else "") for o in (
+    "Acinetobacter_baumannii", "Bordetella_pertussis", "Burkholderia_cepacia", "Burkholderia_mallei",
+    "Burkholderia_pseudomallei", "Campylobacter", "Citrobacter_freundii", "Clostridioides_difficile",
+    "Corynebacterium_diphtheriae", "Enterobacter_asburiae", "Enterobacter_cloacae", "Enterococcus_faecalis",
+    "Enterococcus_faecium", "Escherichia", "Haemophilus_influenzae", "Helicobacter_pylori",
+    "Klebsiella_oxytoca", "Klebsiella_pneumoniae", "Neisseria_gonorrhoeae", "Neisseria_meningitidis",
+    "Pseudomonas_aeruginosa", "Salmonella", "Serratia_marcescens", "Staphylococcus_aureus",
+    "Staphylococcus_epidermidis", "Staphylococcus_pseudintermedius", "Streptococcus_agalactiae",
+    "Streptococcus_pneumoniae", "Streptococcus_pyogenes", "Vibrio_cholerae", "Vibrio_parahaemolyticus",
+    "Vibrio_vulnificus")})
+
+GENOME_MAX_BP = 20_000_000     # whole-genome upload limit (bacterial genomes are ~1–13 Mb)
+GENOME_MIN_BP = 1_000
+GENOME_TIMEOUT_S = 3600
+
+
+# ---------------------------------------------------------------------
+# Genotype -> predicted susceptibility (rule-based)
+#
+# These are the rules evaluated in evaluation/isolate_benchmark.py on 99
+# public clinical K. pneumoniae genomes (evaluation/RESULTS.md, section 4).
+# They are shown in the app ONLY for PHENOTYPE_VALIDATED_ORGANISMS. Change
+# them here and the benchmark uses the change too; re-run it before quoting
+# figures. AMRFinderPlus "Subclass" is split on "/" into tokens.
+# ---------------------------------------------------------------------
+PHENOTYPE_VALIDATED_ORGANISMS = {"Klebsiella_pneumoniae"}
+INTRINSIC_GENES = {"oqxA", "oqxB", "fosA"}   # chromosomal in K. pneumoniae; allele variants also matched
+_CEPH_TOKENS = {"CEPHALOSPORIN", "CARBAPENEM"}
+PHENOTYPE_DRUG_RULES = {
+    # 3rd/4th-generation cephalosporins: acquired ESBL, AmpC or carbapenemase gene
+    "ceftriaxone":   "ceph", "cefotaxime": "ceph", "ceftazidime": "ceph", "cefepime": "ceph",
+    # carbapenems: acquired carbapenemase, or porin disruption + ESBL/AmpC
+    "meropenem":     "carb", "imipenem": "carb", "ertapenem": "carb",
+    "ciprofloxacin": "QUINOLONE", "levofloxacin": "QUINOLONE",
+    "gentamicin":    "GENTAMICIN", "tobramycin": "TOBRAMYCIN", "amikacin": "AMIKACIN",
+    "trimethoprim-sulfamethoxazole": "TRIMETHOPRIM",
+    "tetracycline":  "TETRACYCLINE",
+    "colistin":      "COLISTIN",
+}
+
+
+def _phenotype_usable(findings: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    out = []
+    for f in findings:
+        if (f.get("type") or "").upper() != "AMR":
+            continue
+        if (f.get("method") or "").upper().startswith("INTERNAL_STOP"):
+            continue
+        if any(re.fullmatch(re.escape(g) + r"\d*", f.get("symbol") or "") for g in INTRINSIC_GENES):
+            continue
+        out.append(f)
+    return out
+
+
+def _subclass_tokens(f: Dict[str, Any]) -> set:
+    return {t.strip().upper() for t in (f.get("subclass") or "").split("/") if t.strip()}
+
+
+def _is_point(f: Dict[str, Any]) -> bool:
+    return (f.get("subtype") or "").upper().startswith("POINT")
+
+
+def predict_phenotype(drug: str, findings: List[Dict[str, Any]]):
+    """Return (1 = predicted resistant / 0 = susceptible, responsible element symbols)."""
+    rule = PHENOTYPE_DRUG_RULES[drug]
+    fs = _phenotype_usable(findings)
+    if rule == "ceph":
+        hits = [f for f in fs if not _is_point(f) and _subclass_tokens(f) & _CEPH_TOKENS]
+    elif rule == "carb":
+        hits = [f for f in fs if not _is_point(f) and "CARBAPENEM" in _subclass_tokens(f)]
+        if not hits:
+            porin = [f for f in fs if _is_point(f) and "CARBAPENEM" in _subclass_tokens(f)]
+            bl = [f for f in fs if not _is_point(f) and "CEPHALOSPORIN" in _subclass_tokens(f)]
+            if porin and bl:
+                hits = porin + bl
+    else:
+        hits = [f for f in fs if rule in _subclass_tokens(f)
+                or (rule in ("GENTAMICIN", "TOBRAMYCIN", "AMIKACIN") and _subclass_tokens(f) == {"AMINOGLYCOSIDE"})]
+    return (1 if hits else 0), sorted({f["symbol"] for f in hits})
+
+
+def phenotype_profile(findings: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    out = []
+    for drug in PHENOTYPE_DRUG_RULES:
+        p, why = predict_phenotype(drug, findings)
+        out.append({"drug": drug, "predicted_resistant": bool(p), "determinants": why})
+    return out
+
 
 def _amrfinder_result(sample_id: str, seq_clean: str, findings: List[Dict[str, Any]]) -> Dict[str, Any]:
     """Build the pipeline result from AMRFinderPlus findings for one sequence."""
@@ -1507,13 +1637,15 @@ def _amrfinder_result(sample_id: str, seq_clean: str, findings: List[Dict[str, A
 
 
 def run_amr_pipeline(sample_id: str, sequence: str, identity_threshold: float,
-                     mode: str = "amrfinder", precomputed: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
+                     mode: str = "amrfinder", precomputed: Optional[List[Dict[str, Any]]] = None,
+                     organism: Optional[str] = None) -> Dict[str, Any]:
     """Detection + classification + scoring + HL7 for one sequence.
 
     mode: "amrfinder" | "amrfinder+blast" | "blast" (see ENGINE_MODES).
     If AMRFinderPlus isn't installed, every mode falls back to web BLAST.
     `precomputed` lets the batch runner pass findings from a single
-    multi-sequence AMRFinderPlus call."""
+    multi-sequence AMRFinderPlus call. `organism` (an AMR_ORGANISMS key)
+    adds point-mutation screening."""
     is_valid, err, seq_clean = SequenceValidator.validate_and_clean(sequence)
     if not is_valid:
         return {"ok": False, "error": err, "sample_id": sample_id}
@@ -1525,7 +1657,8 @@ def run_amr_pipeline(sample_id: str, sequence: str, identity_threshold: float,
                 try:
                     with st.spinner("🧬 Running AMRFinderPlus…"):
                         findings = AMRFinderClient.run(
-                            {"query": seq_clean}, SequenceValidator.is_protein(seq_clean)).get("query", [])
+                            {"query": seq_clean}, SequenceValidator.is_protein(seq_clean),
+                            organism=organism or None).get("query", [])
                 except Exception as exc:
                     if mode == "amrfinder":
                         return {"ok": False, "error": f"❌ {exc}", "sample_id": sample_id}
@@ -1571,7 +1704,7 @@ def run_amr_pipeline(sample_id: str, sequence: str, identity_threshold: float,
 
 
 def run_amr_batch(sequences: Dict[str, str], identity_threshold: float, mode: str = "amrfinder",
-                  progress=None) -> List[Dict[str, Any]]:
+                  progress=None, organism: Optional[str] = None) -> List[Dict[str, Any]]:
     """Analyse many sequences. With AMRFinderPlus, all nucleotide sequences
     go through one call and all protein sequences through another, instead
     of one process start per sequence."""
@@ -1593,7 +1726,7 @@ def run_amr_batch(sequences: Dict[str, str], identity_threshold: float, mode: st
             for start in range(0, len(rids), AMR_BATCH_SLICE):
                 part = {rid: group[rid] for rid in rids[start:start + AMR_BATCH_SLICE]}
                 try:
-                    out.update(AMRFinderClient.run(part, protein))
+                    out.update(AMRFinderClient.run(part, protein, organism=organism or None))
                 except Exception as exc:
                     failed = exc
                     break
@@ -1607,7 +1740,8 @@ def run_amr_batch(sequences: Dict[str, str], identity_threshold: float, mode: st
     results, total = [], len(sequences)
     for i, (sid, seq) in enumerate(sequences.items(), start=1):
         try:
-            res = run_amr_pipeline(sid, seq, identity_threshold, mode, precomputed=precomputed.get(sid))
+            res = run_amr_pipeline(sid, seq, identity_threshold, mode, precomputed=precomputed.get(sid),
+                                   organism=organism)
         except Exception as exc:
             res = {"ok": False, "error": f"❌ Error: {exc}", "sample_id": sid}
         results.append(res)
@@ -1616,17 +1750,93 @@ def run_amr_batch(sequences: Dict[str, str], identity_threshold: float, mode: st
     return results
 
 
+def validate_genome(contigs: Dict[str, str]):
+    """Check an uploaded assembly. Returns (ok, error, {contig_id: cleaned_seq})."""
+    if not contigs:
+        return False, "❌ No sequences found in the file", {}
+    dna_chars = SequenceValidator.VALID_DNA_CHARS
+    cleaned: Dict[str, str] = {}
+    for cid, seq in contigs.items():
+        s = re.sub(r"\s+", "", seq or "").upper()
+        if not s:
+            continue
+        bad = set(s) - dna_chars
+        if bad:
+            return False, (f"❌ Contig {cid[:40]} has non-DNA characters ({', '.join(sorted(bad)[:8])}). "
+                           "Whole-genome mode takes a nucleotide assembly."), {}
+        cleaned[cid] = s
+    total = sum(map(len, cleaned.values()))
+    if total < GENOME_MIN_BP:
+        return False, f"❌ Assembly too small ({total:,} bp; minimum {GENOME_MIN_BP:,})", {}
+    if total > GENOME_MAX_BP:
+        return False, f"❌ Assembly too large ({total:,} bp; maximum {GENOME_MAX_BP:,})", {}
+    return True, "", cleaned
+
+
+def run_amr_genome(sample_id: str, contigs: Dict[str, str], organism: Optional[str] = None) -> Dict[str, Any]:
+    """Screen a whole-genome assembly (all contigs = one isolate) with
+    AMRFinderPlus. Reports every determinant, point mutations when an
+    organism is given, and rule-based predicted susceptibility for organisms
+    in PHENOTYPE_VALIDATED_ORGANISMS. No st.* calls."""
+    ok, err, cleaned = validate_genome(contigs)
+    if not ok:
+        return {"ok": False, "error": err, "sample_id": sample_id}
+    if not AMRFinderClient.is_available():
+        return {"ok": False, "sample_id": sample_id,
+                "error": "❌ Whole-genome screening needs AMRFinderPlus, which is not available on this machine "
+                         "(see the Status page). Web BLAST cannot search a whole genome."}
+    organism = organism or None
+    if organism and organism not in AMR_ORGANISMS:
+        return {"ok": False, "error": f"❌ Unknown organism: {organism}", "sample_id": sample_id}
+
+    ids = {f"c{i}": cid for i, cid in enumerate(cleaned, start=1)}
+    joined = "".join(cleaned.values())
+    t0 = time.time()
+    grouped = AMRFinderClient.run({rid: cleaned[cid] for rid, cid in ids.items()}, protein=False,
+                                  organism=organism, timeout=GENOME_TIMEOUT_S, threads=os.cpu_count() or 4)
+    findings = []
+    for rid, fs in grouped.items():
+        for f in fs:
+            findings.append(dict(f, seq_id=ids.get(rid, rid)))
+    findings = [f for f in findings if (f["type"] or "AMR").upper() == "AMR"] or findings
+
+    info = AMRFinderClient.info()
+    meta = {
+        "input_kind": "GENOME", "organism": organism, "contigs": len(cleaned), "genome_bp": len(joined),
+        "seconds": round(time.time() - t0, 1),
+        "sequence_length": len(joined), "sequence_sha256": hashlib.sha256(joined.encode()).hexdigest(),
+    }
+    if not findings:
+        return dict(meta, ok=False, negative=True, sample_id=sample_id, engine="AMRFINDERPLUS",
+                    error=(f"No known resistance determinant detected by AMRFinderPlus "
+                           f"{info.get('software', '?')} (database {info.get('database', '?')})."))
+
+    phenotype = phenotype_profile(findings) if organism in PHENOTYPE_VALIDATED_ORGANISMS else None
+    result = _amrfinder_result(sample_id, "", findings)
+    result.update(meta)
+    result["findings"] = sorted(findings, key=lambda f: (f.get("class") or "", f["symbol"]))
+    result["phenotype"] = phenotype
+    result["display_gene"] = f"{len(findings)} determinant(s)"
+    result["hl7"] = HL7Generator.amr_genome_report(sample_id, AMR_ORGANISMS.get(organism or "", organism),
+                                                   result["findings"], phenotype)
+    return result
+
+
 def log_amr_result(result: Dict[str, Any]) -> Optional[int]:
     """Save a successful genomic result to the database. Returns its id."""
     if not result.get("ok"):
         return None
+    seq = result.get("seq_clean", "")
     details = {
         "engine": result.get("engine"), "gene_info": result["gene_info"], "best": result["best"],
         "findings": result.get("findings", []), "risk": result["risk"],
         "tool_version": result.get("tool_version"), "db_version": result.get("db_version"),
-        "sequence_length": len(result.get("seq_clean", "")),
-        "sequence_sha256": hashlib.sha256(result.get("seq_clean", "").encode()).hexdigest(),
+        "sequence_length": result.get("sequence_length", len(seq)),
+        "sequence_sha256": result.get("sequence_sha256") or hashlib.sha256(seq.encode()).hexdigest(),
     }
+    for k in ("input_kind", "organism", "contigs", "phenotype"):
+        if result.get(k) is not None:
+            details[k] = result[k]
     return get_store().log_analysis(
         result["sample_id"], "GENOMIC", result["display_gene"], result["confidence"],
         result["source"], result["is_demo"], details=details, hl7=result["hl7"])

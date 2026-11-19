@@ -18,6 +18,7 @@ from engine import (
     __version__, anthropic_client, init_session_state, run_startup_tests, service_status,
     run_amr_pipeline, run_amr_batch, log_amr_result, run_epidemic_pipeline, parse_fasta_files,
     EpidemicDetectionEngine, ArticleCredibilityChecker, AMRFinderClient, ENGINE_MODES,
+    run_amr_genome, AMR_ORGANISMS, PHENOTYPE_VALIDATED_ORGANISMS, GENOME_MAX_BP,
     LOCATION_CACHE, LOCATION_CACHE_LOCK, _save_location_cache, maybe_geocode_in_background,
     get_store, start_feed_worker, sync_feed, analyze_feed_item, FEED_INTERVAL_S, FEED_AUTO_ANALYZE_CAP,
 )
@@ -63,8 +64,9 @@ def page_home():
 def page_genomic():
     ui.page_hero("genomic", "Genomic AMR Surveillance",
                  "Antimicrobial <span class='grad'>resistance screening</span>",
-                 "Paste a DNA or protein sequence (or upload FASTA files). NCBI AMRFinderPlus finds the "
-                 "resistance genes it carries; we score the evidence and produce an HL7 lab report.")
+                 "Paste a DNA or protein sequence, upload FASTA files, or upload a whole-genome assembly. "
+                 "NCBI AMRFinderPlus finds the resistance genes and mutations it carries; we score the "
+                 "evidence and produce an HL7 lab report.")
 
     amr_info = AMRFinderClient.info()
     if amr_info.get("ok"):
@@ -94,8 +96,24 @@ def page_genomic():
                 "FASTA files", type=["fa", "fasta", "fna", "txt"],
                 accept_multiple_files=True, key="fasta_uploader")
             batch_trigger = st.button("▶️ Analyze Batch", width="stretch", disabled=not uploaded_fastas)
+            st.caption("Each record is analysed as a separate sequence.")
 
-        with st.expander("⚙️ Search settings"):
+        with st.expander("🧫 Whole genome: upload an assembly"):
+            genome_file = st.file_uploader(
+                "Assembly FASTA (all contigs of one isolate)", type=["fa", "fasta", "fna", "txt"],
+                key="genome_uploader")
+            st.caption(f"All contigs are analysed together as one isolate (up to {GENOME_MAX_BP // 1_000_000} Mb). "
+                       "Set the organism under *Search settings* to include point mutations. "
+                       "Typically 1–5 minutes; up to an hour on a slow machine.")
+            genome_trigger = st.button("▶️ Analyze Genome", width="stretch", disabled=genome_file is None,
+                                       type="primary" if genome_file is not None else "secondary")
+
+        with st.expander("⚙️ Search settings", expanded=genome_file is not None):
+            st.selectbox("Organism", list(AMR_ORGANISMS.keys()), format_func=AMR_ORGANISMS.get,
+                         key="amr_organism",
+                         help="Passed to AMRFinderPlus: adds organism-specific point-mutation screening and "
+                              "hides genes intrinsic to that species. Predicted susceptibility is shown only "
+                              "for Klebsiella pneumoniae, the species the rules were validated on.")
             st.selectbox("Detection engine", list(ENGINE_MODES.keys()),
                          format_func=ENGINE_MODES.get, key="engine_mode")
             st.slider("BLASTN identity threshold (%)", 80, 100, 90, key="identity_threshold",
@@ -127,19 +145,35 @@ curated cutoff 0.85 · partial 0.60–0.65 · HMM only 0.50 · internal stop 0.3
             st.markdown("#### Results")
             _genomic_run(trigger, batch_trigger, sample_id, sequence, uploaded_fastas,
                          st.session_state.get("identity_threshold", 90),
-                         st.session_state.get("engine_mode", "amrfinder"))
+                         st.session_state.get("engine_mode", "amrfinder"),
+                         st.session_state.get("amr_organism", ""),
+                         genome_trigger, genome_file)
             _genomic_render()
 
 
-def _genomic_run(trigger, batch_trigger, sample_id, sequence, uploaded_fastas, identity_threshold, mode):
+def _genomic_run(trigger, batch_trigger, sample_id, sequence, uploaded_fastas, identity_threshold, mode,
+                 organism="", genome_trigger=False, genome_file=None):
     # Results are stored in session_state so they survive unrelated reruns,
     # and successful ones are saved to the database.
+    if genome_trigger and genome_file is not None:
+        st.session_state.pop('last_amr_batch', None)
+        contigs = parse_fasta_files([genome_file])
+        label = AMR_ORGANISMS.get(organism, "organism not specified")
+        try:
+            with st.spinner(f"🧫 Screening {len(contigs)} contig(s) with AMRFinderPlus ({label})… "
+                            "this can take several minutes."):
+                result = run_amr_genome(sample_id, contigs, organism or None)
+            log_amr_result(result)
+            st.session_state['last_amr_result'] = result
+        except Exception as exc:
+            st.session_state['last_amr_result'] = {"ok": False, "error": f"❌ Error: {exc}", "sample_id": sample_id}
+
     if trigger:
         if not sequence.strip():
             st.session_state['last_amr_result'] = {"ok": False, "error": "❌ Enter a sequence", "sample_id": sample_id}
         else:
             try:
-                result = run_amr_pipeline(sample_id, sequence, identity_threshold, mode)
+                result = run_amr_pipeline(sample_id, sequence, identity_threshold, mode, organism=organism or None)
                 log_amr_result(result)
                 st.session_state['last_amr_result'] = result
             except Exception as exc:
@@ -154,7 +188,8 @@ def _genomic_run(trigger, batch_trigger, sample_id, sequence, uploaded_fastas, i
             progress = st.progress(0.0, text=f"Analyzing {len(batch_sequences)} sequence(s)…")
             batch_results = run_amr_batch(
                 batch_sequences, identity_threshold, mode,
-                progress=lambda i, total: progress.progress(i / total, text=f"Analyzed {i}/{total}"))
+                progress=lambda i, total: progress.progress(i / total, text=f"Analyzed {i}/{total}"),
+                organism=organism or None)
             for res in batch_results:
                 log_amr_result(res)
             progress.empty()
@@ -166,10 +201,16 @@ def _genomic_render():
     if result:
         if result.get("negative"):
             st.success(f"✅ {result['error']}")
+            if result.get("input_kind") == "GENOME":
+                st.caption(f"{result['contigs']:,} contig(s), {result['genome_bp']:,} bp, organism: "
+                           f"{AMR_ORGANISMS.get(result.get('organism') or '', 'not specified')}.")
             st.caption("A negative result means no match in the reference database. It does not prove "
-                       "the organism is susceptible: point mutations and novel genes are not covered here.")
+                       "the organism is susceptible: novel genes are not covered, and point mutations are "
+                       "only searched when the organism is set.")
         elif not result.get("ok"):
             st.error(result.get("error", "Unknown error"))
+        elif result.get("input_kind") == "GENOME":
+            _render_genome_result(result)
         else:
             if result["is_demo"]:
                 st.markdown('<div class="demo-alert">⚠️ DEMO MODE — Results randomly generated</div>',
@@ -257,7 +298,56 @@ def _genomic_render():
                                file_name="batch_AMR.hl7", mime="text/plain")
 
     if not result and not batch:
-        st.info("👈 Enter a sequence (or upload FASTA files) and click **Analyze**.")
+        st.info("👈 Enter a sequence, upload FASTA files or a genome assembly, and click **Analyze**.")
+
+
+def _render_genome_result(result):
+    findings = result.get("findings", [])
+    organism = result.get("organism") or ""
+    st.caption(f"Called by AMRFinderPlus {result.get('tool_version', '?')} · database "
+               f"{result.get('db_version', '?')} · {result['seconds']:.0f} s")
+
+    genes = [f for f in findings if not (f.get("subtype") or "").upper().startswith("POINT")]
+    points = [f for f in findings if (f.get("subtype") or "").upper().startswith("POINT")]
+    critical = sorted({f["symbol"] for f in findings
+                       if AMRFinderClient.concern(f.get("class", ""), f.get("subclass", "")) == "CRITICAL"})
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Genome", f"{result['genome_bp'] / 1e6:.2f} Mb", f"{result['contigs']:,} contigs", delta_color="off")
+    m2.metric("Resistance genes", len(genes))
+    m3.metric("Point mutations", len(points) if organism else "not searched")
+    m4.metric("Critical-concern", len(critical))
+    st.caption(f"Organism: **{AMR_ORGANISMS.get(organism, 'not specified')}**"
+               + ("" if organism else " · set it under *Search settings* to search point mutations"))
+    if critical:
+        st.warning("⚠️ Critical-concern determinants: " + ", ".join(critical))
+
+    st.markdown(f"##### 🧬 {len(findings)} resistance determinant(s)")
+    st.dataframe(pd.DataFrame([{
+        "Determinant": f["symbol"], "Type": "point mutation" if f in points else "gene",
+        "Class": f["class"], "Subclass": f["subclass"], "Method": f["method"],
+        "Identity %": f["identity"], "Coverage %": f["coverage"], "Contig": f["seq_id"],
+        "Name": f["name"],
+    } for f in findings]), width="stretch", hide_index=True)
+
+    phenotype = result.get("phenotype")
+    if phenotype:
+        st.markdown("##### 💊 Predicted susceptibility (rule-based)")
+        st.dataframe(pd.DataFrame([{
+            "Drug": p["drug"], "Prediction": "🔴 Resistant" if p["predicted_resistant"] else "🟢 Susceptible",
+            "Based on": ", ".join(p["determinants"]) or "no determinant found",
+        } for p in phenotype]), width="stretch", hide_index=True)
+        st.caption("Validated on 99 public clinical *K. pneumoniae* genomes: 89.2% agreement with laboratory "
+                   "results, 95.0% sensitivity, 77.0% specificity (evaluation/RESULTS.md, section 4). "
+                   "Weak for amikacin, cefepime, colistin and tetracycline. A genotype prediction does not "
+                   "replace laboratory susceptibility testing.")
+    elif organism and organism not in PHENOTYPE_VALIDATED_ORGANISMS:
+        st.caption("Predicted susceptibility is shown only for *Klebsiella pneumoniae*; the rules have "
+                   "not been validated for other species.")
+
+    st.markdown("##### 📋 HL7 ORU^R01 (v2.5)")
+    st.code(result["hl7"], language="text")
+    st.download_button("📥 Download HL7", data=result["hl7"],
+                       file_name=f"{result['sample_id']}_AMR_genome.hl7", mime="text/plain")
 
 
 # =====================================================================
